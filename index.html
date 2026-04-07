@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recomendador de Tarifas Endesa - Papernest</title>
+    <title>Recomendador Endesa - Papernest</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -11,299 +11,154 @@
             font-family: 'Avenir';
             src: local('Avenir'), local('Avenir-Light');
         }
-        #papernest-endesa-tool {
+        #endesa-tool-container {
             font-family: 'Avenir', system-ui, -apple-system, sans-serif;
             background-color: transparent;
-            width: 100%;
-            display: block;
         }
-        #papernest-endesa-tool .hide-element { 
-            display: none !important; 
-        }
-        #papernest-endesa-tool #dropdown-menu::-webkit-scrollbar {
-            width: 6px;
-        }
-        #papernest-endesa-tool #dropdown-menu::-webkit-scrollbar-thumb {
-            background-color: #E7E5E4;
-            border-radius: 10px;
-        }
-        #desc-container {
-            transition: all 0.3s ease-out;
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #E7E5E4; border-radius: 10px; }
+        
+        .tariff-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
-<body class="bg-transparent">
+<body class="bg-transparent p-2">
 
-<div id="papernest-endesa-tool" class="text-[#1C1917] antialiased">
-    <div class="flex flex-col items-center py-2 w-full">
+<div id="endesa-tool-container" class="max-w-2xl mx-auto text-[#1C1917] antialiased">
+    <div class="bg-white rounded-[24px] border border-[#E7E5E4] shadow-sm overflow-hidden">
         
-        <div class="bg-white rounded-[24px] w-full border border-[#E7E5E4] shadow-sm overflow-hidden">
-            
-            <div class="bg-[#FAFAF9] px-6 md:px-10 py-4 border-b border-[#E7E5E4] flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Endesa_Logo.svg" alt="Logo Endesa" class="h-6 w-auto">
-                    <span class="h-4 w-px bg-[#D6D3D1]"></span>
-                    <span class="text-[10px] font-bold text-[#79716B] uppercase tracking-widest">Tarifas 2026</span>
+        <div class="bg-[#FAFAF9] px-6 py-4 border-b border-[#E7E5E4] flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Endesa_Logo.svg" alt="Endesa" class="h-6">
+                <span class="h-4 w-px bg-[#D6D3D1]"></span>
+                <span class="text-[10px] font-bold text-[#79716B] uppercase tracking-widest">Asesor de Ahorro</span>
+            </div>
+        </div>
+
+        <div class="p-6 md:p-8">
+            <h1 class="text-xl font-bold mb-2 tracking-tight">Encuentra tu tarifa ideal</h1>
+            <p class="text-[#57534D] text-sm mb-8 leading-relaxed">Selecciona tus preferencias para ver las ofertas personalizadas de Endesa.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-[#79716B]">Tipo de suministro</label>
+                    <select id="supply-type" onchange="updateTariffOptions()" class="w-full bg-[#F6F5FF] border border-[#CECCFF] text-[#1B194D] text-sm py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5A52FF] appearance-none cursor-pointer">
+                        <option value="luz">Luz</option>
+                        <option value="gas">Gas</option>
+                        <option value="dual">Dual (Luz + Gas)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-[#79716B]">Preferencia de precio</label>
+                    <select id="tariff-type" onchange="showRecommendations()" class="w-full bg-[#F6F5FF] border border-[#CECCFF] text-[#1B194D] text-sm py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5A52FF] appearance-none cursor-pointer">
+                        </select>
                 </div>
             </div>
 
-            <div class="p-6 md:p-10">
-                <h1 class="text-xl font-bold mb-4 tracking-tight text-[#1C1917]">Encuentra tu tarifa ideal de Endesa</h1>
-                <p class="text-[#57534D] text-sm md:text-base mb-8 text-left leading-relaxed">
-                    Compara las mejores ofertas de luz y gas. Selecciona una opción para ver los detalles y encontrar la que mejor se adapta a tu consumo.
-                </p>
-                
-                <div class="mb-8 relative" id="dropdown-container">
-                    <label class="block text-sm font-bold mb-3 text-[#1C1917]">¿Qué tarifa te interesa consultar?</label>
-                    <div id="select-btn" class="w-full bg-[#F0F7FF] border border-[#BFDBFE] hover:border-[#0056b3] text-sm py-4 px-5 rounded-xl transition-all font-semibold cursor-pointer flex items-center justify-between">
-                        <div class="flex items-center gap-3 truncate pr-4">
-                            <span id="select-icon" class="text-[#0056b3] flex-shrink-0 flex items-center justify-center w-4 h-4">
-                                <i data-lucide="search" class="w-4 h-4"></i>
-                            </span>
-                            <span id="select-text" class="text-[#0056b3] truncate">Selecciona una tarifa...</span>
-                        </div>
-                        <i data-lucide="chevron-down" id="select-chevron" class="w-4 h-4 text-[#0056b3] transition-transform duration-200"></i>
-                    </div>
-                    
-                    <div id="dropdown-menu" class="hide-element absolute w-full mt-2 bg-white border border-[#E7E5E4] rounded-xl shadow-xl max-h-[350px] overflow-y-auto py-2 z-10"></div>
+            <div id="results-container" class="space-y-4">
                 </div>
-
-                <div id="desc-container" class="hide-element mb-8 p-6 rounded-2xl border opacity-0 transform translate-y-2">
-                    <div class="flex items-start gap-4">
-                        <span id="desc-icon-wrapper" class="flex-shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center"></span>
-                        <div class="w-full">
-                            <h4 id="desc-title" class="font-bold text-[#1B194D] text-lg mb-3"></h4>
-                            
-                            <div class="flex items-start gap-3 p-3 bg-white rounded-xl shadow-sm border border-white/50 mb-4">
-                                <div id="profil-icon-bg" class="flex-shrink-0 p-1.5 rounded-lg">
-                                    <i data-lucide="user-check" class="w-4 h-4"></i>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] font-bold text-[#A6A09B] uppercase tracking-wider mb-0.5">Perfil recomendado</p>
-                                    <p id="desc-profil-text" class="text-sm font-medium text-[#1B194D]"></p>
-                                </div>
-                            </div>
-
-                            <div id="desc-text" class="text-[#57534D] text-sm leading-relaxed"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-center mt-6">
-                    <button id="cta-btn" class="w-full sm:w-auto min-w-[260px] bg-[#0056b3] hover:bg-[#004494] text-white font-bold text-base py-4 px-8 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-3 group opacity-40 pointer-events-none" onclick="handleCTAClick()">
-                        <span>Ver condiciones y contratar</span>
-                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Inicialización de iconos
-    if (typeof lucide !== 'undefined') { lucide.createIcons(); }
-
-    // Datos de las ofertas de Endesa
-    const endesaOffers = [
-        { 
-            id: 'conecta-luz', 
-            name: "Endesa Conecta Luz", 
-            url: "https://www.papernest.es/endesa/tarifas/conecta-luz/", 
-            type: "luz", 
-            profil: "Hogares que buscan un precio fijo estable las 24 horas.", 
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Mismo precio del kWh durante todo el día.</li><li>Sin sorpresas en tu factura a final de mes.</li><li>Gestión 100% online y sin permanencia.</li></ul>" 
-        },
-        { 
-            id: 'tarifa-libre', 
-            name: "Tarifa Libre Endesa", 
-            url: "https://www.papernest.es/endesa/tarifas/tarifa-libre/", 
-            type: "luz", 
-            profil: "Consumidores que quieren libertad total y precios competitivos.", 
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Alternativa flexible del mercado libre.</li><li>Protección frente a la volatilidad del mercado.</li><li>Descuentos aplicados directamente en el término de energía.</li></ul>" 
-        },
-        { 
-            id: 'tarifa-happy', 
-            name: "Tarifa Happy", 
-            url: "https://www.papernest.es/endesa/tarifas/tarifa-happy/", 
-            type: "luz", 
-            profil: "Personas que concentran su consumo en horas específicas.", 
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Tú eliges tus horas de consumo gratuito (2h/día o 1 día/semana).</li><li>0€/kWh durante los periodos que selecciones.</li><li>Ideal para poner electrodomésticos de alto consumo.</li></ul>" 
-        },
-        { 
-            id: 'pvpc', 
-            name: "Tarifa PVPC (Mercado Regulado)", 
-            url: "https://www.papernest.es/endesa/tarifas/tarifa-pvpc/", 
-            type: "regulado", 
-            profil: "Usuarios que pueden desplazar su consumo a horas baratas.", 
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Precio fijado por el mercado mayorista hora a hora.</li><li>Necesaria para solicitar el Bono Social.</li><li>Gestión a través de Energía XXI (Referencia de Endesa).</li></ul>" 
-        },
-        { 
-            id: 'conecta-gas', 
-            name: "Endesa Conecta Gas", 
-            url: "https://www.papernest.es/endesa/tarifas/conecta-gas/", 
-            type: "gas", 
-            profil: "Viviendas con calefacción de gas que buscan sencillez.", 
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Precio fijo por el término de energía de gas.</li><li>Contratación rápida y digital.</li><li>Disponible para tarifas de acceso RL.1, RL.2 y RL.3.</li></ul>" 
-        },
-        { 
-            id: 'tur-gas', 
-            name: "Tarifa de Último Recurso (TUR)", 
-            url: "https://www.papernest.es/endesa/tarifas/tarifa-ultimo-recurso/", 
-            type: "regulado", 
-            profil: "Consumos domésticos que buscan el precio regulado por el Gobierno.", 
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Precio revisado trimestralmente por el Estado.</li><li>Suele ser la opción más económica para pequeños consumidores.</li><li>Sin servicios adicionales obligatorios.</li></ul>" 
-        },
-        { 
-            id: 'formidable', 
-            name: "Tarifa Formidable (Luz + Gas)", 
-            url: "https://www.papernest.es/endesa/tarifas/formidable/", 
-            type: "dual", 
-            profil: "Hogares que quieren unificar suministros y maximizar el ahorro.", 
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Grandes descuentos al contratar luz y gas juntos.</li><li>Una sola factura para mayor comodidad.</li><li>Bonificaciones por fidelidad y mantenimiento.</li></ul>" 
-        },
-        { 
-            id: 'tarifa-unica', 
-            name: "Tarifa Única de Endesa", 
-            url: "https://www.papernest.es/endesa/tarifas/tarifa-unica/", 
-            type: "dual", 
-            profil: "Clientes que quieren una cuota fija personalizada sin regularizaciones.", 
-            description: "<ul class='list-disc pl-5 space-y-1.5'><li>Pagas lo mismo cada mes basado en tu consumo histórico.</li><li>Sin regularizaciones a final de año si te mantienes en los límites.</li><li>Energía 100% renovable incluida.</li></ul>" 
-        }
+    const OFFERS = [
+        // LUZ
+        { id: 1, supply: 'luz', type: 'fija', name: "Endesa Conecta Luz", desc: "Precio fijo 24h. Ideal para máxima tranquilidad.", url: "https://www.papernest.es/endesa/tarifas/conecta-luz/" },
+        { id: 2, supply: 'luz', type: 'fija', name: "Endesa One Luz", desc: "Gestión 100% online con precio estable.", url: "https://www.papernest.es/endesa/tarifas/one-luz/" },
+        { id: 3, supply: 'luz', type: 'variable', name: "Tarifa Happy", desc: "Tú eliges tus horas gratis de consumo eléctrico.", url: "https://www.papernest.es/endesa/tarifas/tarifa-happy/" },
+        { id: 4, supply: 'luz', type: 'indexada', name: "Tarifa PVPC", desc: "Mercado regulado. Precio variable hora a hora.", url: "https://www.papernest.es/endesa/tarifas/tarifa-pvpc/" },
+        
+        // GAS
+        { id: 5, supply: 'gas', type: 'fija', name: "Endesa Conecta Gas", desc: "La opción más sencilla para tu hogar.", url: "https://www.papernest.es/endesa/tarifas/conecta-gas/" },
+        { id: 6, supply: 'gas', type: 'indexada', name: "Tarifa TUR Gas", desc: "Tarifa de Último Recurso regulada por el Gobierno.", url: "https://www.papernest.es/endesa/tarifas/tarifa-ultimo-recurso/" },
+        
+        // DUAL
+        { id: 7, supply: 'dual', type: 'fija', name: "Tarifa Formidable", desc: "Ahorra unificando luz y gas con grandes descuentos.", url: "https://www.papernest.es/endesa/tarifas/formidable/" },
+        { id: 8, supply: 'dual', type: 'fija', name: "Tarifa Única", desc: "Cuota fija mensual personalizada sin sorpresas.", url: "https://www.papernest.es/endesa/tarifas/tarifa-unica/" }
     ];
 
-    // Temas de colores de Endesa
-    const typeColors = {
-        luz: { text: '#0056b3', bg: '#F0F7FF', border: '#BFDBFE', icon: 'zap' },
-        gas: { text: '#0097A7', bg: '#F0FDFA', border: '#99F6E4', icon: 'flame' },
-        dual: { text: '#4F46E5', bg: '#EEF2FF', border: '#C7D2FE', icon: 'layers' },
-        regulado: { text: '#D97706', bg: '#FFFBEB', border: '#FDE68A', icon: 'landmark' }
-    };
-
-    const selectBtn = document.getElementById('select-btn');
-    const selectText = document.getElementById('select-text');
-    const selectIcon = document.getElementById('select-icon');
-    const selectChevron = document.getElementById('select-chevron');
-    const dropdownMenu = document.getElementById('dropdown-menu');
-    const descContainer = document.getElementById('desc-container');
-    const descTitle = document.getElementById('desc-title');
-    const descProfilText = document.getElementById('desc-profil-text');
-    const profilIconBg = document.getElementById('profil-icon-bg');
-    const descText = document.getElementById('desc-text');
-    const descIconWrapper = document.getElementById('desc-icon-wrapper');
-    const ctaBtn = document.getElementById('cta-btn');
-
-    let isOpen = false;
-    let selectedOffer = null;
-
-    // Tracking bridge
-    function trackTool(actionName) {
-        const nom_du_tool = "endesa-tarifas-modern";
-        if (window.parent) {
-            window.parent.postMessage({
-                'event': 'tool_interaction',
-                'tool_name': nom_du_tool, 
-                'tool_action': actionName
-            }, '*');
-        }
-    }
-
-    function renderDropdown() {
-        dropdownMenu.innerHTML = "";
-        endesaOffers.forEach(offer => {
-            const theme = typeColors[offer.type];
-            const item = document.createElement('div');
-            item.className = 'flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-[#FAFAF9] transition-colors';
-            item.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <i data-lucide="${theme.icon}" class="w-4 h-4 text-[#A6A09B]"></i>
-                    <span class="text-sm font-medium text-[#57534D]">${offer.name}</span>
-                </div>
-                <i data-lucide="check" class="w-4 h-4 hide-element" style="color: ${theme.text}"></i>
-            `;
-            item.onclick = (e) => { 
-                e.stopPropagation(); 
-                selectOffer(offer); 
-                closeDropdown(); 
-            };
-            dropdownMenu.appendChild(item);
-        });
-        lucide.createIcons();
-    }
-
-    function toggleDropdown() {
-        isOpen = !isOpen;
-        if (isOpen) {
-            dropdownMenu.classList.remove('hide-element');
-            selectChevron.classList.add('rotate-180');
+    function updateTariffOptions() {
+        const supply = document.getElementById('supply-type').value;
+        const tariffSelect = document.getElementById('tariff-type');
+        
+        let options = '';
+        if (supply === 'luz') {
+            options = `<option value="fija">Precio Fijo</option>
+                       <option value="variable">Horas Gratis (Variable)</option>
+                       <option value="indexada">Precio de Mercado (Indexada)</option>`;
+        } else if (supply === 'gas') {
+            options = `<option value="fija">Precio Fijo</option>
+                       <option value="indexada">Tarifa Regulada TUR (Indexada)</option>`;
         } else {
-            closeDropdown();
+            options = `<option value="fija">Paquetes Ahorro (Fijo)</option>`;
         }
+        
+        tariffSelect.innerHTML = options;
+        showRecommendations();
     }
 
-    function closeDropdown() {
-        isOpen = false;
-        dropdownMenu.classList.add('hide-element');
-        selectChevron.classList.remove('rotate-180');
-    }
-
-    function selectOffer(offer) {
-        selectedOffer = offer;
-        const theme = typeColors[offer.type];
+    function showRecommendations() {
+        const supply = document.getElementById('supply-type').value;
+        const type = document.getElementById('tariff-type').value;
+        const container = document.getElementById('results-container');
         
-        selectText.innerText = offer.name;
-        selectText.className = 'truncate text-[#1C1917] font-bold';
-        selectIcon.innerHTML = `<i data-lucide="${theme.icon}" class="w-4 h-4" style="color: ${theme.text}"></i>`;
-        selectBtn.classList.remove('bg-[#F0F7FF]');
-        selectBtn.classList.add('bg-white', 'border-[#0056b3]', 'ring-2', 'ring-blue-50');
-
-        descContainer.style.backgroundColor = theme.bg;
-        descContainer.style.borderColor = theme.border;
-        descTitle.innerText = offer.name;
-        descProfilText.innerText = offer.profil;
-        profilIconBg.style.backgroundColor = theme.bg;
-        profilIconBg.style.color = theme.text;
-        descText.innerHTML = offer.description;
-        descIconWrapper.innerHTML = `<i data-lucide="${theme.icon}" class="w-5 h-5" style="color: ${theme.text}"></i>`;
+        const filtered = OFFERS.filter(o => o.supply === supply && o.type === type);
         
-        descContainer.classList.remove('hide-element');
-        setTimeout(() => {
-            descContainer.classList.replace('opacity-0', 'opacity-100');
-            descContainer.classList.remove('translate-y-2');
-        }, 10);
+        container.innerHTML = filtered.map(o => `
+            <div class="tariff-card bg-[#FAFAF9] border border-[#E7E5E4] rounded-2xl p-5 hover:border-[#5A52FF] transition-all">
+                <div class="flex items-start gap-4">
+                    <div class="p-2 bg-white rounded-lg shadow-sm">
+                        <i data-lucide="${supply === 'luz' ? 'zap' : supply === 'gas' ? 'flame' : 'layers'}" class="w-5 h-5 text-[#5A52FF]"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-[#1B194D]">${o.name}</h4>
+                        <p class="text-sm text-[#57534D] mb-4">${o.desc}</p>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <a href="${o.url}" target="_blank" class="flex-1 min-w-[140px] bg-[#5A52FF] hover:bg-[#443EC1] text-white text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                Ver condiciones
+                            </a>
+                            <a href="tel:919014228" class="flex-1 min-w-[140px] bg-white border border-[#CECCFF] text-[#5A52FF] hover:bg-[#F6F5FF] text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                                <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                                919 014 228
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
         
-        ctaBtn.classList.remove('opacity-40', 'pointer-events-none');
-        
-        trackTool("selection_" + offer.id);
         lucide.createIcons();
+        sendResize();
+        trackTool("filter_change_" + supply + "_" + type);
     }
 
-    function handleCTAClick() {
-        if (selectedOffer) {
-            trackTool("cta_click_" + selectedOffer.id);
-            window.open(selectedOffer.url, '_blank');
-        }
+    // Bridge de comunicación e Iframe Resize
+    function trackTool(actionName) {
+        window.parent.postMessage({
+            'event': 'tool_interaction',
+            'tool_name': 'endesa-comparator-pro', 
+            'tool_action': actionName
+        }, '*');
     }
 
     function sendResize() {
-        if (window.parent) {
-            window.parent.postMessage({
-                type: 'papernest-tool-resize',
-                height: document.body.scrollHeight
-            }, '*');
-        }
+        window.parent.postMessage({
+            type: 'papernest-tool-resize',
+            height: document.body.scrollHeight
+        }, '*');
     }
 
-    const observer = new ResizeObserver(() => sendResize());
-    observer.observe(document.body);
-
-    selectBtn.onclick = (e) => { e.stopPropagation(); toggleDropdown(); };
-    document.onclick = () => closeDropdown();
-
-    window.onload = () => { 
-        renderDropdown(); 
-        sendResize(); 
+    window.onload = () => {
+        updateTariffOptions();
+        const observer = new ResizeObserver(sendResize);
+        observer.observe(document.body);
     };
 </script>
+
 </body>
 </html>
